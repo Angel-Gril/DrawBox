@@ -1,6 +1,6 @@
 window.DRAWBOX_CONFIG = {
-  // Example: "https://yourname.github.io"
-  pagesOrigin: "https://angel-gril.github.io",
+  // GitHub Pages origin for the image repositories
+  pagesOrigin: "https://drawboxassets.github.io",
 
   // Optional explicit mapping: data/image-map.json
   imageMapUrl: "data/image-map.json",

@@ -42,22 +42,25 @@ npm run images:shard -- --source images-source --repo-size-mib 650 --apply
 - `data/image-map.json`：每张图片对应的仓库
 - `tools/config-snippet.json`：推荐配置
 
-为每个 `drawbox-img-*` 目录创建同名公开 GitHub 仓库，把对应目录内容放在仓库根目录，然后在仓库设置中开启 GitHub Pages。最后把 `pagesOrigin` 写入 `js/config.js`：
+本地分片目录保持为 `drawbox-img-01` 至 `drawbox-img-04`，发布时分别推送到 `DrawBoxAssets` 组织下的四个公开仓库：
 
-```js
-pagesOrigin: "https://你的GitHub用户名.github.io"
-```
+- `image-shards/drawbox-img-01/` → `DrawBoxAssets/img-01`
+- `image-shards/drawbox-img-02/` → `DrawBoxAssets/img-02`
+- `image-shards/drawbox-img-03/` → `DrawBoxAssets/img-03`
+- `image-shards/drawbox-img-04/` → `DrawBoxAssets/img-04`
 
-例如仓库 `drawbox-img-01` 中的：
+每个图片仓库都在 `Settings > Pages` 中选择 `Deploy from a branch`，使用 `main` 分支和 `/ (root)`。
+
+`data/image-map.json` 已写入每张图片对应的完整 Pages 地址。例如：
 
 ```text
 images/originals/14347.jpg
 ```
 
-最终会从下面的地址访问：
+会从下面的地址访问：
 
 ```text
-https://你的GitHub用户名.github.io/drawbox-img-01/images/originals/14347.jpg
+https://drawboxassets.github.io/img-04/images/originals/14347.jpg
 ```
 
 详细说明见 `tools/README.md`。

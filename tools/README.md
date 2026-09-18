@@ -44,7 +44,7 @@ images/twitter/2082005807676420128.jpg
 node tools/build-image-shards.mjs --source images-source --repo-size-mib 650
 ```
 
-默认只生成计划，不复制文件。计划写入 `tools/image-shard-plan.json`，包含每个 `drawbox-img-*` 仓库的容量、文件列表和仓库总数。
+默认只生成计划，不复制文件。计划写入 `tools/image-shard-plan.json`，包含每个 `drawbox-img-*` 本地分片的容量、文件列表和仓库总数。
 
 GitHub Pages 单个已发布站点约为 1 GB，但还需要留意：
 
@@ -81,27 +81,29 @@ node tools/build-image-shards.mjs --source images-source --repo-size-mib 650 --a
 
 ## 4. 发布图片仓库
 
-对每个 `image-shards/drawbox-img-*` 目录：
-
-1. 创建同名公开 GitHub 仓库
-2. 把该目录内容放在仓库根目录
-3. 在 `Settings > Pages` 中选择 `Deploy from a branch`
-4. 选择 `main` 分支和 `/ (root)`
-5. 等待 Pages 发布
-
-主站图片地址遵循：
+发布时，把四个本地分片分别推送到 `DrawBoxAssets` 组织下的公开仓库：
 
 ```text
-https://用户名.github.io/图片仓库名/图片相对路径
+image-shards/drawbox-img-01  ->  DrawBoxAssets/img-01
+image-shards/drawbox-img-02  ->  DrawBoxAssets/img-02
+image-shards/drawbox-img-03  ->  DrawBoxAssets/img-03
+image-shards/drawbox-img-04  ->  DrawBoxAssets/img-04
 ```
 
-最后在 `js/config.js` 设置：
+对每个仓库：
 
-```js
-pagesOrigin: "https://用户名.github.io"
+1. 把对应的 `image-shards/drawbox-img-*` 目录内容放在仓库根目录
+2. 在 `Settings > Pages` 中选择 `Deploy from a branch`
+3. 选择 `main` 分支和 `/ (root)`
+4. 等待 Pages 发布
+
+主站图片地址由 `data/image-map.json` 中的完整 URL 决定，例如：
+
+```text
+https://drawboxassets.github.io/img-01/images/originals/14347.jpg
 ```
 
-`data/image-map.json` 会决定每张图片具体请求哪个仓库。
+`js/config.js` 中的 `pagesOrigin` 仅作为后备配置；当前路由优先使用 `image-map.json`。
 
 ## 本地服务器
 
