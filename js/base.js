@@ -5,7 +5,7 @@
    ========================================================= */
 const App = (() => {
   // ---------- 配置 ----------
-  const ASSET_VERSION = '4';
+  const ASSET_VERSION = '5';
   const FAV_KEY = 'drawbox-boards-v1';
   const REC_KEY = 'drawbox-recent-v1';
   const IMAGE_CONFIG = window.DRAWBOX_CONFIG || {};
@@ -191,7 +191,7 @@ const App = (() => {
     const wm = (category || '图').slice(0, 1);
     const hint = '<span class="load-hint">原图加载中，首次打开请稍候…</span>';
     const inner = img
-      ? `${hint}<img class="ph-img" data-src="${esc(imgUrl(img))}" alt="${esc(category)}" onload="this.previousElementSibling?.remove()" onerror="this.style.display='none'">`
+      ? `${hint}<img class="ph-img" data-src="${esc(imgUrl(img))}" alt="${esc(category)}" onload="this.previousElementSibling?.remove()" onerror="this.previousElementSibling?.remove();this.style.display='none'">`
       : `<span class="wm">${esc(wm)}</span>`;
     return `<div class="ph" style="height:${hh}px;background:linear-gradient(140deg,${bg} 0%,${main} 135%);">${inner}</div>`;
   }
@@ -327,6 +327,7 @@ document.addEventListener('click', e => {
     App.openLightbox(+card.dataset.id);
   }
 });
+
 
 
 
