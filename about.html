@@ -15,7 +15,6 @@
 .prose .lead{font-size:17px;color:var(--ink)}
 .prose ul{padding-left:20px;margin:0 0 14px}
 .prose li{margin:7px 0}
-.prose code{font-family:"DM Mono",ui-monospace,monospace;font-size:13px;background:var(--surface-2);padding:2px 6px;border-radius:6px;color:var(--ink)}
 .stat-row{display:flex;gap:18px;flex-wrap:wrap;margin:24px 0}
 .stat-row .s{flex:1;min-width:140px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;text-align:center;box-shadow:var(--shadow-sm)}
 .stat-row .s b{display:block;font-family:var(--serif);font-size:30px;color:var(--garden)}
@@ -27,13 +26,13 @@
 <main>
   <div class="page-head"><div class="shell" style="text-align:center">
     <p class="eyebrow">About DrawBox</p>
-    <h1>一个轻量的提示词仓库</h1>
+    <h1>一个轻量的提示词画廊</h1>
     <p class="sub">浏览、搜索、收藏和复制，全部在浏览器里完成。</p>
   </div></div>
 
   <section class="sec"><div class="shell">
     <div class="prose">
-      <p class="lead">DrawBox 是一个纯静态 AI 图像提示词画廊。项目不依赖后端数据库，所有页面与数据都能直接部署到 GitHub Pages。</p>
+      <p class="lead">DrawBox 是一个纯静态 AI 图像提示词画廊。无需注册，打开页面即可浏览与检索。</p>
 
       <div class="stat-row">
         <div class="s"><b>5,452</b><span>提示词</span></div>
@@ -44,19 +43,12 @@
       <h2>主要功能</h2>
       <ul>
         <li><b>分类与搜索</b>：按大分类、小分类筛选，也可以搜索标题、正文和标签。</li>
-        <li><b>完整正文</b>：列表使用轻量数据，详情按需加载完整提示词。</li>
-        <li><b>本地收藏</b>：收藏数据保存在浏览器 localStorage，不需要账号。</li>
-        <li><b>深色模式</b>：跟随站点主题切换，偏好同样保存在本地。</li>
+        <li><b>详情与图片</b>：列表快速浏览，详情页和灯箱按需加载内容。</li>
+        <li><b>本地收藏</b>：收藏数据保存在浏览器，不需要账号。</li>
+        <li><b>深色模式</b>：主题偏好同样保存在本地。</li>
       </ul>
 
-      <h2>图片如何加载</h2>
-      <p>主站只保存页面、JSON 数据和图片索引，不把全部原图塞进一个 GitHub 仓库。图片按配置分散到多个 GitHub Pages 图片仓库，浏览器会根据路径映射请求对应仓库。</p>
-      <p>图片仓库和映射在 <code>js/config.js</code> 与 <code>data/image-map.json</code> 中维护。项目附带分片脚本，可以按容量把本地原图分配并复制到多个仓库目录。</p>
-
-      <h2>部署方式</h2>
-      <p>主站是普通静态文件，开启 GitHub Pages 后即可访问。图片仓库同样开启 Pages，并在配置里填写 GitHub Pages 域名和仓库列表。每个图片仓库独立计算站点容量与流量。</p>
-
-      <h2>本地数据</h2>
+      <h2>数据与隐私</h2>
       <div class="note">
         <p>DrawBox 不上传收藏、不记录登录状态，也不依赖第三方接口。清除浏览器站点数据会同时清除主题与收藏记录。</p>
       </div>
@@ -66,9 +58,8 @@
     </div>
   </div></section>
 </main>
-<script src="js/config.js?v=1"></script>
-<script src="js/base.js?v=5"></script>
+<script src="js/config.js?v=2"></script>
+<script src="js/base.js?v=6"></script>
 <script>App.init({ page:'about' });</script>
 </body>
 </html>
-
