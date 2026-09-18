@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DrawBox · AI Prompt Gallery</title>
+<meta name="description" content="DrawBox - browse, search and collect AI image prompts.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css?v=4">
+</head>
+<body data-page="index">
+<main>
+  <section class="hero">
+    <div class="hero-grid">
+      <div class="hero-left">
+        <p class="kicker">DrawBox · AI Prompt Gallery</p>
+        <h1>把灵感放进你的<br class="hide-mobile"><span class="hl">DrawBox</span></h1>
+        <p class="lead">浏览整理后的 AI 图像提示词，按分类快速筛选，查看完整正文，一键复制并保存到自己的收藏画板。</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="gallery.html">进入画廊
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          <a class="btn btn-soft" href="categories.html">浏览全部分类</a>
+        </div>
+        <div class="hero-stats">
+          <div class="s"><b>5,452</b><span>提示词</span></div>
+          <div class="s"><b>12</b><span>大分类</span></div>
+          <div class="s"><b>79</b><span>小分类</span></div>
+        </div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="db-hero-panel">
+          <span class="db-mark">DB</span>
+          <b>Prompt Library</b>
+          <p>Search · Copy · Collect</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="shell">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow">12 大分类 · 79 小类</p>
+          <h2>挑一个主题，开始浏览</h2>
+          <p>从人物、动漫到海报、产品与建筑场景，按主题进入对应画廊。</p>
+        </div>
+        <a class="link-more" href="categories.html">查看分类总览
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+      <div class="cat-grid" id="catGrid"></div>
+    </div>
+  </section>
+
+  <section class="sec" style="background:var(--surface-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+    <div class="shell">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow">Editor's Pick</p>
+          <h2>随机精选</h2>
+          <p>随机抽取一组提示词，点开卡片查看详情。</p>
+        </div>
+        <button class="btn btn-soft" id="refreshFeatured">换一批
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.22-8.56"/><path d="M21 3v6h-6"/></svg></button>
+      </div>
+      <div class="masonry" id="featuredGrid"></div>
+      <div style="text-align:center;margin-top:30px">
+        <a class="btn btn-primary" href="gallery.html?cat=全部">查看全部 5,452 条
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="js/config.js?v=1"></script>
+<script src="js/base.js?v=4"></script>
+<script>
+App.init({ page:'index', onReady:function(){
+  const D = App.D;
+  App.renderCategories(App.$('#catGrid'));
+  const pool = D.samples.slice();
+  function shuffle(a){ return a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(p=>p[1]); }
+  function renderFeatured(){ App.renderCards(shuffle(pool).slice(0,12), App.$('#featuredGrid')); }
+  renderFeatured();
+  App.$('#refreshFeatured').addEventListener('click', renderFeatured);
+}});
+</script>
+</body>
+</html>
+

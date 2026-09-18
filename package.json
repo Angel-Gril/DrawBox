@@ -1,0 +1,12 @@
+{
+  "name": "drawbox",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "serve": "node tools/serve.mjs .",
+    "images:download": "node tools/download-images.mjs",
+    "images:plan": "node tools/build-image-shards.mjs --repo-size-mib 650",
+    "images:shard": "node tools/build-image-shards.mjs --repo-size-mib 650 --apply"
+  }
+}

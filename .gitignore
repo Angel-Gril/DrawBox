@@ -1,0 +1,7 @@
+node_modules/
+images-source/
+image-shards/
+tools/image-shard-plan.json
+tools/config-snippet.json
+.DS_Store
+Thumbs.db

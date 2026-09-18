@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>详情 · DrawBox</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css?v=4">
+<style>
+.detail-panel{display:grid;grid-template-columns:1.05fr .95fr;gap:0;background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow);margin-top:8px}
+.detail-img{position:relative;background:var(--surface-2);min-height:460px;display:grid;place-items:center;
+  overflow:auto;max-height:88vh;padding:18px}
+.detail-img .ph{position:absolute;inset:0}
+.detail-img .ph-img{position:static;inset:auto;width:auto;max-width:100%;max-height:calc(88vh - 36px);
+  height:auto;object-fit:contain;display:block;border-radius:14px;box-shadow:var(--shadow)}
+.detail-img .wm{position:absolute;font-family:var(--serif);font-weight:900;font-size:130px;color:rgba(255,255,255,.35);mix-blend-mode:overlay}
+.detail-body{padding:34px 36px;display:flex;flex-direction:column;gap:16px}
+@media(max-width:780px){.detail-panel{grid-template-columns:1fr}.detail-img{min-height:260px}}
+</style>
+</head>
+<body data-page="detail">
+<main>
+  <div class="shell">
+    <div id="detailMount"></div>
+  </div>
+  <section class="sec" style="padding-top:30px"><div class="shell">
+    <div class="sec-head"><div><p class="eyebrow">Related</p><h2>同类推荐</h2></div>
+      <a class="link-more" id="moreCat" href="#">查看更多</a></div>
+    <div class="masonry" id="related"></div>
+  </div></section>
+</main>
+<script src="js/config.js?v=1"></script>
+<script src="js/base.js?v=4"></script>
+<script>
+App.init({ page:'detail', onReady:function(){
+  const D = App.D;
+  const id = +new URLSearchParams(location.search).get('id');
+  let s = App.findSample(id) || D.samples[0];
+  const { bg, main } = App.catColor(s.category);
+  const wm = (s.category || '图').slice(0, 1);
+  const esc = t => (t == null ? '' : String(t)).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+  const heart = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7.5-4.6-10-9.3C.3 8.4 2 5 5.3 5c2 0 3.4 1.2 4.7 3 1.3-1.8 2.7-3 4.7-3C18 5 19.7 8.4 22 11.7 19.5 16.4 12 21 12 21z"/></svg>`;
+
+  function detailImgHTML(s){
+    const hint = '<span class="load-hint">原图加载中，首次打开请稍候…</span>';
+    return s.image
+      ? `${hint}<img class="ph-img" src="${esc(App.imgUrl(s.image))}" alt="${esc(s.category)}" onload="this.previousElementSibling?.remove()">`
+      : `<div class="ph" style="background:linear-gradient(140deg,${bg},${main})"></div><span class="wm">${esc(wm)}</span>`;
+  }
+  function tokPrompt(p){ return esc(p || '（加载中…）').replace(/(\{argument[^}]*\})/g, '<span class="tok">$1</span>'); }
+
+  function build(){
+    const tok = tokPrompt(s.prompt);
+    $('#detailMount').innerHTML = `
+      <a class="link-more" href="gallery.html" style="margin-bottom:14px;display:inline-flex">← 返回画廊</a>
+      <div class="detail-panel">
+        <div class="detail-img" id="dImg">${detailImgHTML(s)}</div>
+        <div class="detail-body">
+          <div class="lb-crumb"><a href="gallery.html">画廊</a> › <a href="gallery.html?cat=${encodeURIComponent(s.category)}" style="color:${main}">${esc(s.category)}</a></div>
+          <h1 class="lb-title">${esc(s.title)}</h1>
+          <div class="lb-tags"><span class="tag cc" style="background:${bg};color:${main}">${esc(s.category)}</span><span class="tag">ID #${s.id}</span></div>
+          <div class="lb-prompt" id="dPrompt">${tok}</div>
+          <div class="lb-actions">
+            <button class="btn btn-primary" id="copyBtn">复制提示词</button>
+            <button class="btn btn-soft fav-btn" data-id="${s.id}">${heart} 收藏</button>
+          </div>
+          <p style="color:var(--muted);font-size:12.5px;margin:6px 0 0">提示：本页为灯箱详情的页面版；在画廊里点卡片可直接唤起全屏灯箱。</p>
+        </div>
+      </div>`;
+    $('#copyBtn').addEventListener('click', () => App.copyText(s.prompt || ''));
+    const di = $('#dImg').querySelector('img');
+    if (di) di.addEventListener('error', () => { $('#dImg').innerHTML = `<div class="ph" style="background:linear-gradient(140deg,${bg},${main})"></div><span class="wm">${esc(wm)}</span>`; });
+    const fb = $('#detailMount').querySelector('.fav-btn');
+    if (App.isFav(s.id)) fb.classList.add('on');
+    fb.addEventListener('click', function(){ const on = App.toggleFav(s.id); this.classList.toggle('on', on); });
+    $('#moreCat').href = 'gallery.html?cat=' + encodeURIComponent(s.category);
+    const rel = D.samples.filter(x => x.category === s.category && x.id !== s.id).slice(0, 8);
+    if (rel.length) App.renderCards(rel, $('#related')); else $('#related').innerHTML = '<div class="empty">暂无同类推荐</div>';
+  }
+
+  build();
+  // 轻量数据无 prompt：按需补齐后刷新正文
+  if (!s.prompt){
+    App.ensureFull().then(() => {
+      const f = App.findSample(id);
+      if (f && f.prompt){ s = f; const p = $('#dPrompt'); if (p) p.innerHTML = tokPrompt(f.prompt); }
+    });
+  }
+}});
+</script>
+</body>
+</html>
+

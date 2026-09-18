@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>画廊 · DrawBox</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css?v=4">
+<style>
+.masonry.uniform{columns:1}
+.masonry.uniform .card{display:grid;grid-template-columns:200px 1fr;margin-bottom:14px}
+.masonry.uniform .card .thumb{height:100%}
+.masonry.uniform .card .thumb .ph{height:150px}
+.masonry.uniform .card .body{justify-content:center}
+@media(max-width:560px){.masonry.uniform .card{grid-template-columns:1fr}.masonry.uniform .card .thumb .ph{height:180px}}
+</style>
+</head>
+<body data-page="gallery">
+<main>
+  <div class="page-head"><div class="shell">
+    <p class="eyebrow">Gallery</p>
+    <h1>提示词画廊</h1>
+    <p class="sub">按大类、小类筛选，或用关键词搜索；点卡片看完整提示词，心仪的收进画板。</p>
+  </div></div>
+
+  <div class="shell">
+    <div class="gallery-layout">
+      <!-- FILTER RAIL -->
+      <aside class="filter-rail" id="filterRail">
+        <h4>全部分类</h4>
+        <div class="filter-group" id="filterGroup"></div>
+        <div style="margin-top:6px"><button class="chip" id="clearFilter">清除筛选</button></div>
+      </aside>
+
+      <!-- RESULTS -->
+      <section>
+        <div class="gallery-bar">
+          <span class="count" id="resultCount">—</span>
+          <div class="nav-search" style="width:280px;height:44px;margin:0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M16 16L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <input id="galSearch" type="text" placeholder="在结果里搜索…">
+          </div>
+          <span class="spacer"></span>
+          <div class="view-toggles" id="viewToggle">
+            <button data-view="masonry" class="active" title="瀑布流">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="8" height="10" rx="1.5"/><rect x="13" y="3" width="8" height="6" rx="1.5"/><rect x="13" y="11" width="8" height="10" rx="1.5"/><rect x="3" y="15" width="8" height="6" rx="1.5"/></svg></button>
+            <button data-view="uniform" title="列表">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="5" rx="1.5"/><rect x="3" y="11" width="18" height="5" rx="1.5"/><rect x="3" y="18" width="18" height="3" rx="1.5"/></svg></button>
+          </div>
+          <select class="sort-select" id="sortSel">
+            <option value="latest">最新</option>
+            <option value="hot">最热</option>
+          </select>
+        </div>
+        <div class="masonry" id="grid"></div>
+        <button class="show-more" id="showMore">显示更多</button>
+      </section>
+    </div>
+  </div>
+</main>
+<script src="js/config.js?v=1"></script>
+<script src="js/base.js?v=4"></script>
+<script>
+App.init({ page:'gallery', onReady:function(){
+  const D = App.D;
+  const sub2maj = {};
+  D.majors.forEach(m => m.subs.forEach(s => sub2maj[s.name] = m.name));
+  const params = new URLSearchParams(location.search);
+  let state = { cat: params.get('cat') || '全部', q:'', sort:'latest', view:'masonry', shown:24 };
+
+  const fg = $('#filterGroup');
+  const railHTML = D.majors.map((m,i) => {
+    const open = (m.name === state.cat || sub2maj[state.cat] === m.name) ? 'open' : '';
+    const activeSub = (sub2maj[state.cat] === m.name) ? state.cat : '';
+    const subs = m.subs.map(s => `<button data-cat="${s.name}" class="${s.name === activeSub ? 'active' : ''}">${s.name}<span class="n">${s.count}</span></button>`).join('');
+    return `<div class="maj ${open}" data-maj="${m.name}">
+      <button><span>${m.name} <span style="color:var(--muted);font-weight:500">· ${m.count}</span></span>
+        <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="sublist">${subs}</div></div>`;
+  }).join('');
+  fg.innerHTML = railHTML;
+  fg.querySelectorAll('.maj>button').forEach(b => b.addEventListener('click', () => b.parentElement.classList.toggle('open')));
+  fg.querySelectorAll('.sublist button').forEach(b => b.addEventListener('click', () => { state.cat = b.dataset.cat; state.shown = 24; syncFilterUI(); render(); }));
+
+  function syncFilterUI(){
+    fg.querySelectorAll('.maj').forEach(mj => {
+      const open = (mj.dataset.maj === state.cat || sub2maj[state.cat] === mj.dataset.maj);
+      mj.classList.toggle('open', open);
+      mj.querySelectorAll('.sublist button').forEach(b => b.classList.toggle('active', b.dataset.cat === state.cat));
+    });
+  }
+
+  $('#galSearch').addEventListener('input', e => { state.q = e.target.value.trim(); state.shown = 24; render(); });
+  $('#sortSel').addEventListener('change', e => { state.sort = e.target.value; render(); });
+  $('#viewToggle').querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+    state.view = b.dataset.view;
+    $('#viewToggle').querySelectorAll('button').forEach(x => x.classList.toggle('active', x === b));
+    $('#grid').classList.toggle('uniform', state.view === 'uniform');
+  }));
+  $('#clearFilter').addEventListener('click', () => { state.cat = '全部'; state.q = ''; $('#galSearch').value = ''; state.shown = 24; syncFilterUI(); render(); });
+  $('#showMore').addEventListener('click', () => { state.shown += 24; render(); });
+
+  function filtered(){
+    let list = D.samples.slice();
+    if (state.cat !== '全部'){
+      if (sub2maj[state.cat]) list = list.filter(s => s.category === state.cat);
+      else list = list.filter(s => sub2maj[s.category] === state.cat);
+    }
+    if (state.q){ const q = state.q.toLowerCase(); list = list.filter(s => (s.title + s.category + (s.prompt || '')).toLowerCase().includes(q)); }
+    if (state.sort === 'hot') list.sort((a,b) => b.likes - a.likes);
+    else list.sort((a,b) => b.id - a.id);
+    return list;
+  }
+  function render(){
+    const list = filtered();
+    $('#resultCount').textContent = '共 ' + list.length + ' 条';
+    App.renderCards(list.slice(0, state.shown), $('#grid'));
+    $('#showMore').style.display = list.length > state.shown ? 'block' : 'none';
+  }
+  render();
+  // 全文搜索（prompt）需完整数据
+  App.ensureFull();
+  window.__onFullLoaded = function(){ render(); };
+}});
+</script>
+</body>
+</html>
+

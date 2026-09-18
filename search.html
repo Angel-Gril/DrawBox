@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>搜索 · DrawBox</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css?v=4">
+</head>
+<body data-page="search">
+<main>
+  <section class="search-hero"><div class="shell">
+    <p class="eyebrow">Search</p>
+    <h1 class="serif" style="font-size:clamp(28px,4vw,42px);font-weight:900;margin:0">搜你喜欢的那一句</h1>
+    <div class="big-search">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M16 16L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input id="bigSearch" type="text" placeholder="试试「赛博朋克」「角色立绘」「电影感」…" autocomplete="off">
+      <button class="btn btn-primary" id="goBtn">搜索</button>
+    </div>
+    <div class="recent-row" id="recentRow"><span class="lbl">最近搜索</span></div>
+    <div class="recent-row" id="hotRow"><span class="lbl">大家都在搜</span></div>
+  </div></section>
+
+  <section class="sec" style="padding-top:24px"><div class="shell">
+    <div class="gallery-bar">
+      <span class="count" id="resultCount">输入关键词开始搜索</span>
+      <span class="spacer"></span>
+      <select class="sort-select" id="sortSel"><option value="latest">最新</option><option value="hot">最热</option></select>
+    </div>
+    <div class="masonry" id="grid"></div>
+    <div class="empty" id="empty" style="display:none"><div class="big">🔍</div>没有匹配的提示词，换个关键词试试。</div>
+  </div></section>
+</main>
+<script src="js/config.js?v=1"></script>
+<script src="js/base.js?v=4"></script>
+<script>
+App.init({ page:'search', onReady:function(){
+  const D = App.D;
+  const REC_KEY = 'drawbox-recent-v1';
+  const big = $('#bigSearch');
+  const params = new URLSearchParams(location.search);
+  let state = { q: params.get('q') || '', sort:'latest' };
+
+  function getRecent(){ try { return JSON.parse(localStorage.getItem(REC_KEY)) || []; } catch(e){ return []; } }
+  function addRecent(q){ if(!q) return; let r = getRecent().filter(x => x !== q); r.unshift(q); r = r.slice(0,6); localStorage.setItem(REC_KEY, JSON.stringify(r)); renderRecent(); }
+  function renderRecent(){
+    const r = getRecent();
+    $('#recentRow').innerHTML = '<span class="lbl">最近搜索</span>' + (r.length ? r.map(x => `<button class="chip" data-q="${x}">${x}</button>`).join('') : '<span style="color:var(--muted);font-size:13px">暂无</span>');
+    $('#recentRow').querySelectorAll('[data-q]').forEach(b => b.addEventListener('click', () => doSearch(b.dataset.q)));
+  }
+  $('#hotRow').innerHTML = '<span class="lbl">大家都在搜</span>' + D.hot.map(x => `<button class="chip" data-q="${x}">${x}</button>`).join('');
+  $('#hotRow').querySelectorAll('[data-q]').forEach(b => b.addEventListener('click', () => doSearch(b.dataset.q)));
+
+  function doSearch(q){ big.value = q; state.q = q; addRecent(q); render(); }
+  $('#goBtn').addEventListener('click', () => doSearch(big.value.trim()));
+  big.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(big.value.trim()); });
+  $('#sortSel').addEventListener('change', e => { state.sort = e.target.value; render(); });
+
+  function render(){
+    const q = state.q.toLowerCase();
+    $('#resultCount').textContent = state.q ? '「' + state.q + '」相关结果' : '推荐 · 热门提示词';
+    let list = state.q ? D.samples.filter(s => (s.title + s.category + (s.prompt || '')).toLowerCase().includes(q)) : D.samples.slice().sort((a,b) => b.likes - a.likes);
+    if (state.sort === 'hot') list.sort((a,b) => b.likes - a.likes); else list.sort((a,b) => b.id - a.id);
+    $('#empty').style.display = list.length ? 'none' : 'block';
+    App.renderCards(list.slice(0, 48), $('#grid'));
+  }
+  renderRecent(); render();
+  App.ensureFull();
+  window.__onFullLoaded = function(){ render(); };
+}});
+</script>
+</body>
+</html>
+

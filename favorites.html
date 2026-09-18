@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>收藏 · DrawBox</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css?v=4">
+</head>
+<body data-page="favorites">
+<main>
+  <div class="page-head"><div class="shell">
+    <p class="eyebrow">Favorites</p>
+    <h1>我的收藏画板</h1>
+    <p class="sub">无需登录，收藏保存在本机浏览器。可建多个画板分门别类，随时导出 Markdown。</p>
+  </div></div>
+
+  <div class="shell">
+    <div class="board-tabs" id="boardTabs"></div>
+    <div class="board-bar">
+      <button class="board-tab" id="newBoardBtn" style="border-style:dashed">＋ 新建画板</button>
+      <span class="spacer"></span>
+      <button class="btn btn-soft" id="exportBtn">导出 Markdown</button>
+    </div>
+    <div class="masonry" id="favGrid"></div>
+    <div class="empty" id="favEmpty" style="display:none"><div class="big">🌼</div>这个画板还是空的，去画廊点 ❤ 收藏喜欢的提示词吧。</div>
+  </div>
+</main>
+<script src="js/config.js?v=1"></script>
+<script src="js/base.js?v=4"></script>
+<script>
+App.init({ page:'favorites', onReady:function(){
+  let B = App.getBoards();
+
+  function save(){ App.saveBoards(B); }
+  function renderTabs(){
+    $('#boardTabs').innerHTML = B.boards.map(b =>
+      `<button class="board-tab ${b.id===B.active?'active':''}" data-id="${b.id}">${b.name} <span style="opacity:.6;font-weight:500">${b.items.length}</span></button>`
+    ).join('');
+    $('#boardTabs').querySelectorAll('[data-id]').forEach(t => t.addEventListener('click', () => {
+      B.active = t.dataset.id; save(); renderTabs(); renderGrid();
+    }));
+  }
+  $('#newBoardBtn').addEventListener('click', () => {
+    const name = prompt('给新画板起个名字：', '灵感合集'); if (!name) return;
+    const id = 'b' + Date.now();
+    B.boards.push({ id, name, items:[] });
+    B.active = id; save(); renderTabs(); renderGrid(); App.toast('已新建画板');
+  });
+  $('#exportBtn').addEventListener('click', () => {
+    const board = B.boards.find(x => x.id === B.active);
+    if (!board || !board.items.length){ App.toast('画板为空，无法导出'); return; }
+    const lines = ['# ' + board.name + '（DrawBox）', ''];
+    board.items.forEach(id => {
+      const s = App.findSample(id); if (!s) return;
+      lines.push('## ' + s.title + '  ');
+      lines.push('- 分类：' + s.category + ' · ID #' + s.id + ' · ❤ ' + s.likes);
+      lines.push('```'); lines.push(s.prompt || ''); lines.push('```'); lines.push('');
+    });
+    const blob = new Blob([lines.join('\n')], { type:'text/markdown' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = board.name + '.md'; a.click();
+    App.toast('已导出 Markdown');
+  });
+
+  function renderGrid(){
+    const board = B.boards.find(x => x.id === B.active) || B.boards[0];
+    const items = board.items.map(id => App.findSample(id)).filter(Boolean);
+    if (!items.length){ $('#favGrid').innerHTML = ''; $('#favEmpty').style.display = 'block'; return; }
+    $('#favEmpty').style.display = 'none';
+    App.renderCards(items, $('#favGrid'));
+  }
+  renderTabs(); renderGrid();
+  // 全文导出需要 prompt，确保完整数据已载入
+  App.ensureFull();
+}});
+</script>
+</body>
+</html>
+

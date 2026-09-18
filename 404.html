@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>页面走丢了 · DrawBox</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css?v=4">
+<style>
+.err{text-align:center;padding:70px 20px}
+.err .code{font-family:var(--serif);font-size:96px;font-weight:900;color:var(--garden);line-height:1;margin:0}
+.err h1{font-family:var(--serif);font-size:28px;margin:10px 0 8px}
+.err p{color:var(--muted);margin:0 0 26px}
+.err .acts{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+</style>
+</head>
+<body data-page="404">
+<main>
+  <div class="shell">
+    <div class="err">
+      <p class="code">404</p>
+      <h1>这朵DrawBox暂时没找到</h1>
+      <p>你访问的页面可能已被移动或从未存在。</p>
+      <div class="acts">
+        <a class="btn btn-primary" href="index.html">回到首页</a>
+        <a class="btn btn-soft" href="gallery.html">逛逛画廊</a>
+        <a class="btn btn-soft" href="search.html">去搜索</a>
+      </div>
+    </div>
+  </div>
+</main>
+<script src="js/config.js?v=1"></script>
+<script src="js/base.js?v=4"></script>
+<script>App.init({ page:'404' });</script>
+</body>
+</html>
+
