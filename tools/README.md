@@ -114,3 +114,5 @@ node tools/serve.mjs .
 ```powershell
 $env:PORT=9000; node tools/serve.mjs .
 ```
+
+本地服务器会自动读取 `data/image-map.json`，把 /images/... 请求映射到 `image-shards/` 中对应的图片仓库，因此发布前也可以直接预览原图。
