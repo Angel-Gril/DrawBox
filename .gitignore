@@ -5,3 +5,6 @@ tools/
 package.json
 .DS_Store
 Thumbs.db
+upstream-data/
+$null
+*.part

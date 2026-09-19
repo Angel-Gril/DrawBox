@@ -5,11 +5,13 @@
    ========================================================= */
 const App = (() => {
   // ---------- 配置 ----------
-  const ASSET_VERSION = '6';
+  const ASSET_VERSION = '7';
   const FAV_KEY = 'drawbox-boards-v1';
   const REC_KEY = 'drawbox-recent-v1';
   const IMAGE_CONFIG = window.DRAWBOX_CONFIG || {};
   let IMAGE_MAP = {};
+  let IMAGE_MAP_READY = false;
+  let IMAGE_MAP_COUNT = 0;
 
   // ---------- 工具 ----------
   const $  = (s, r = document) => r.querySelector(s);
@@ -37,6 +39,8 @@ const App = (() => {
       if (/^https?:\/\//i.test(mapped)) return mapped.replace(/\/$/, '') + '/' + p;
       if (IMAGE_CONFIG.pagesOrigin) return IMAGE_CONFIG.pagesOrigin.replace(/\/$/, '') + '/' + mapped.replace(/^\/|\/$/g, '') + '/' + p;
     }
+    // A completed map is authoritative: unavailable upstream files should use the local placeholder.
+    if (IMAGE_MAP_READY && IMAGE_MAP_COUNT) return '';
     const bucket = imageBucket(p);
     const shards = bucket && IMAGE_CONFIG.imageShards ? IMAGE_CONFIG.imageShards[bucket] : null;
     if (Array.isArray(shards) && shards.length) {
@@ -85,14 +89,18 @@ const App = (() => {
       IMAGE_MAP = res.ok ? await res.json() : {};
     } catch (err) {
       IMAGE_MAP = {};
+    } finally {
+      IMAGE_MAP_COUNT = IMAGE_MAP && typeof IMAGE_MAP === 'object' ? Object.keys(IMAGE_MAP).length : 0;
+      IMAGE_MAP_READY = true;
     }
   }
 
   async function loadData(){
-    await loadImageMap();
+    const mapPromise = loadImageMap();
     const meta = await (await fetch(withVersion('data/meta.json'))).json();
     META = meta;
     const parts = await Promise.all(LIST_PARTS.map(u => fetch(withVersion(u)).then(x => x.json()).catch(() => [])));
+    await mapPromise;
     SAMPLES = [].concat(...parts);
     SAMPLES.forEach(s => { DETAIL[s.id] = s; });
   }
@@ -190,8 +198,9 @@ const App = (() => {
     const hh = 180 + ((s.id || 0) % 5) * 46;
     const wm = (category || '图').slice(0, 1);
     const hint = '<span class="load-hint">原图加载中，首次打开请稍候…</span>';
-    const inner = img
-      ? `${hint}<img class="ph-img" data-src="${esc(imgUrl(img))}" alt="${esc(category)}" onload="this.previousElementSibling?.remove()" onerror="this.previousElementSibling?.remove();this.style.display='none'">`
+    const url = img ? imgUrl(img) : '';
+    const inner = url
+      ? `${hint}<img class="ph-img" data-src="${esc(url)}" alt="${esc(category)}" loading="lazy" decoding="async" onload="this.previousElementSibling?.remove()" onerror="this.previousElementSibling?.remove();this.style.display='none'">`
       : `<span class="wm">${esc(wm)}</span>`;
     return `<div class="ph" style="height:${hh}px;background:linear-gradient(140deg,${bg} 0%,${main} 135%);">${inner}</div>`;
   }
@@ -261,8 +270,9 @@ const App = (() => {
     const lbImg = $('#lbImg');
     const hint = '<span class="load-hint">原图加载中，首次打开请稍候…</span>';
     const fallback = `<div class="ph" style="background:linear-gradient(140deg,${bg},${main})"></div><span class="wm">${esc((s.category || '图').slice(0,1))}</span>`;
-    if (s.image){
-      lbImg.innerHTML = `${hint}<img class="ph-img" src="${esc(imgUrl(s.image))}" alt="${esc(s.category)}">`;
+    const imageUrl = s.image ? imgUrl(s.image) : '';
+    if (imageUrl){
+      lbImg.innerHTML = `${hint}<img class="ph-img" src="${esc(imageUrl)}" alt="${esc(s.category)}" decoding="async">`;
       const im = lbImg.querySelector('img');
       im.addEventListener('load', () => { const h = lbImg.querySelector('.load-hint'); if (h) h.remove(); });
       im.addEventListener('error', () => { lbImg.innerHTML = fallback; });

@@ -33,7 +33,7 @@
   </div></section>
 </main>
 <script src="js/config.js?v=2"></script>
-<script src="js/base.js?v=6"></script>
+<script src="js/base.js?v=7"></script>
 <script>
 App.init({ page:'detail', onReady:function(){
   const D = App.D;
@@ -46,8 +46,9 @@ App.init({ page:'detail', onReady:function(){
 
   function detailImgHTML(s){
     const hint = '<span class="load-hint">原图加载中，首次打开请稍候…</span>';
-    return s.image
-      ? `${hint}<img class="ph-img" src="${esc(App.imgUrl(s.image))}" alt="${esc(s.category)}" onload="this.previousElementSibling?.remove()">`
+    const imageUrl = s.image ? App.imgUrl(s.image) : '';
+    return imageUrl
+      ? `${hint}<img class="ph-img" src="${esc(imageUrl)}" alt="${esc(s.category)}" decoding="async" onload="this.previousElementSibling?.remove()">`
       : `<div class="ph" style="background:linear-gradient(140deg,${bg},${main})"></div><span class="wm">${esc(wm)}</span>`;
   }
   function tokPrompt(p){ return esc(p || '（加载中…）').replace(/(\{argument[^}]*\})/g, '<span class="tok">$1</span>'); }
