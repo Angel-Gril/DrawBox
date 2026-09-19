@@ -11,3 +11,15 @@ DrawBox 是一个纯静态 AI 提示词画廊，使用 HTML、CSS、JavaScript �
 - 详情查看与图片灯箱
 - 本地收藏，无需账号
 - 深色模式
+
+## Codex Skill
+
+仓库内含 `skills/drawbox-prompt-match`，用于将上传的参考图转换为视觉 JSON、匹配 DrawBox 提示词，并整理可继续用于图像生成的 prompt。
+
+安装到本机 Codex 技能目录：
+
+```powershell
+Copy-Item -Recurse -Force ".\skills\drawbox-prompt-match" "$env:USERPROFILE\.codex\skills\"
+```
+
+调用时可以让 Codex 使用 `$drawbox-prompt-match` 分析参考图并检索匹配提示词。该 skill 默认读取线上 DrawBox 数据，也支持通过 `--root` 使用本地仓库数据。

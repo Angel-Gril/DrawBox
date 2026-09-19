@@ -1,0 +1,7 @@
+interface:
+  display_name: "DrawBox Prompt Match"
+  short_description: "Match a photo to DrawBox prompts and build a generation prompt"
+  brand_color: "#E4572E"
+  default_prompt: "Use $drawbox-prompt-match to analyze my reference image and match it with DrawBox prompts."
+policy:
+  allow_implicit_invocation: true
