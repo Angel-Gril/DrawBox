@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "total": 20070,
+  "parts": 3,
+  "generatedFrom": "upstream-data + data/image-map.json",
+  "counts": {
+    "buckets": {
+      "twitter": 6571,
+      "twitter-cat1": 46,
+      "twitter-cat2": 12,
+      "originals": 13441
+    },
+    "sources": {
+      "modern": 5443,
+      "classic": 7377,
+      "oldTwitter": 6364,
+      "oldMain": 13441
+    },
+    "repos": {
+      "img-04": 3110,
+      "img-03": 1861,
+      "img-02": 306,
+      "img-01": 166,
+      "img-12": 3700,
+      "img-13": 4107,
+      "img-11": 2812,
+      "img-10": 2122,
+      "img-09": 948,
+      "img-08": 335,
+      "img-07": 279,
+      "img-06": 211,
+      "img-05": 113
+    },
+    "multi": 3705,
+    "gallery": 7377,
+    "oldMain": 13441,
+    "oldTwitter": 6364,
+    "unassigned": 0
+  }
+}

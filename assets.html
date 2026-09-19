@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>素材库 · DrawBox</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css?v=4">
+<style>
+.assets-page{padding-bottom:72px}
+.assets-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:6px 0 32px}
+.assets-summary .s{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow-sm)}
+.assets-summary .s b{display:block;font-family:var(--serif);font-size:28px;line-height:1.15;color:var(--garden)}
+.assets-summary .s span{display:block;margin-top:6px;font-size:12.5px;color:var(--muted);font-weight:600}
+.assets-layout{display:grid;grid-template-columns:238px minmax(0,1fr);gap:28px;align-items:start}
+.assets-filter{position:sticky;top:calc(var(--nav-h) + 18px);background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow-sm);max-height:calc(100vh - 100px);overflow:auto}
+.assets-filter h4{margin:0 0 9px;font-size:12px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+.filter-block{margin-bottom:20px}.filter-block:last-child{margin-bottom:0}
+.asset-filter-btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:8px 11px;border-radius:10px;color:var(--ink-2);font-size:13.5px;font-weight:600;text-align:left;transition:.16s}
+.asset-filter-btn:hover{background:var(--surface-2);color:var(--garden)}
+.asset-filter-btn.active{background:var(--garden-050);color:var(--garden);font-weight:700}
+.asset-filter-btn .n{font-size:11px;color:var(--muted);font-weight:500}
+.asset-filter-btn.active .n{color:var(--garden)}
+.asset-tools{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.asset-tools .nav-search{width:min(360px,100%);height:44px;margin:0}
+.asset-tools .count{font-size:14px;font-weight:700;color:var(--ink)}
+.asset-tools .shown{font-size:12.5px;color:var(--muted)}
+.asset-tools .spacer{flex:1}
+.asset-grid{columns:4;column-gap:16px}
+.asset-card{break-inside:avoid;margin:0 0 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);transition:.22s var(--ease)}
+.asset-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--line-2)}
+.asset-open{display:block;width:100%;padding:0;background:var(--surface-2);position:relative;overflow:hidden;text-align:left}
+.asset-open img{display:block;width:100%;height:auto;min-height:100px;background:var(--surface-2);transition:.25s var(--ease)}
+.asset-card:hover .asset-open img{transform:scale(1.015)}
+.asset-placeholder{display:grid;place-items:center;min-height:170px;position:relative;color:rgba(255,255,255,.82);font-family:var(--serif);font-size:54px;font-weight:900;mix-blend-mode:normal}
+.asset-placeholder::after{content:"";position:absolute;inset:0;background:radial-gradient(120% 80% at 70% 0%,rgba(255,255,255,.3),transparent 58%)}
+.asset-repo{position:absolute;right:10px;top:10px;z-index:2;padding:4px 9px;border-radius:999px;background:rgba(18,26,30,.72);color:#fff;font-family:"DM Mono",monospace;font-size:10.5px;letter-spacing:.02em;backdrop-filter:blur(5px)}
+.asset-body{padding:12px 13px 13px;display:flex;flex-direction:column;gap:8px}
+.asset-title{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-align:left;color:var(--ink);font-size:14px;font-weight:700;line-height:1.45}
+.asset-title:hover{color:var(--garden)}
+.asset-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--muted);font-size:11.5px}
+.asset-meta span:first-child{font-family:"DM Mono",monospace;color:var(--ink-2)}
+.asset-meta .cat{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.asset-source-row{display:flex;gap:5px;flex-wrap:wrap}
+.asset-source{display:inline-flex;align-items:center;padding:3px 7px;border-radius:999px;background:var(--surface-2);color:var(--muted);font-size:10.5px;font-weight:700}
+.asset-source.modern{background:#DFF4EA;color:#247452}
+.asset-source.classic{background:#E8F1F8;color:#2F6F91}
+.asset-source.oldMain{background:#F5ECD8;color:#8A6533}
+.asset-source.oldTwitter{background:#F3E3F5;color:#82538C}
+.asset-more{display:block;margin:32px auto 0;padding:12px 34px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-weight:700;box-shadow:var(--shadow-sm);transition:.18s}
+.asset-more:hover{border-color:var(--garden);color:var(--garden)}
+.asset-note{margin-top:24px;padding:15px 17px;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius);color:var(--muted);font-size:12.5px;line-height:1.7}
+.asset-loading{padding:70px 0;text-align:center;color:var(--muted)}
+.asset-empty{columns:auto;padding:70px 20px;text-align:center;color:var(--muted)}
+.asset-empty .big{font-size:44px;margin-bottom:8px}
+.lb-asset-path{margin:0;padding:10px 12px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;color:var(--muted);font-family:"DM Mono",monospace;font-size:11.5px;word-break:break-all}
+@media(max-width:1100px){.asset-grid{columns:3}.assets-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:860px){.assets-layout{grid-template-columns:1fr}.assets-filter{position:static;max-height:none}.asset-grid{columns:3}}
+@media(max-width:650px){.asset-grid{columns:2;column-gap:12px}.asset-tools{gap:9px}.asset-tools .nav-search{width:100%}.asset-tools .spacer{display:none}.asset-tools .count{width:100%}}
+@media(max-width:430px){.assets-summary{grid-template-columns:1fr}.asset-grid{columns:1}.assets-summary .s{padding:15px 17px}.asset-body{padding:11px 12px}.asset-open img{min-height:180px}}
+</style>
+</head>
+<body data-page="assets">
+<main>
+  <div class="page-head"><div class="shell">
+    <p class="eyebrow">All Assets</p>
+    <h1>全部素材库</h1>
+    <p class="sub">按原始图片路径浏览完整备份池，不压缩、不改名。这里与提示词画廊分开检索，图片由独立图片仓库提供。</p>
+  </div></div>
+
+  <section class="sec assets-page"><div class="shell">
+    <div class="assets-summary" id="assetsSummary">
+      <div class="s"><b>20,070</b><span>唯一图片素材</span></div>
+      <div class="s"><b>13</b><span>独立图片仓库</span></div>
+      <div class="s"><b>7.8 GiB</b><span>原始文件备份</span></div>
+      <div class="s"><b>0</b><span>画质压缩</span></div>
+    </div>
+
+    <div class="assets-layout">
+      <aside class="assets-filter" id="assetFilters">
+        <div class="filter-block"><h4>素材来源</h4>
+          <button class="asset-filter-btn active" data-source="all">全部素材 <span class="n">20,070</span></button>
+          <button class="asset-filter-btn" data-source="modern">主画廊 <span class="n">—</span></button>
+          <button class="asset-filter-btn" data-source="classic">经典版 <span class="n">—</span></button>
+          <button class="asset-filter-btn" data-source="oldMain">历史原图 <span class="n">—</span></button>
+          <button class="asset-filter-btn" data-source="oldTwitter">Twitter 收录 <span class="n">—</span></button>
+        </div>
+        <div class="filter-block"><h4>图库分区</h4>
+          <button class="asset-filter-btn active" data-bucket="all">全部图库 <span class="n">20,070</span></button>
+          <button class="asset-filter-btn" data-bucket="originals">原图素材 <span class="n">—</span></button>
+          <button class="asset-filter-btn" data-bucket="twitter">Twitter 素材 <span class="n">—</span></button>
+          <button class="asset-filter-btn" data-bucket="twitter-cat1">Twitter 分类 1 <span class="n">—</span></button>
+          <button class="asset-filter-btn" data-bucket="twitter-cat2">Twitter 分类 2 <span class="n">—</span></button>
+        </div>
+        <div class="filter-block"><h4>作品形态</h4>
+          <button class="asset-filter-btn" data-multi="1">多图作品 <span class="n">—</span></button>
+        </div>
+      </aside>
+
+      <section>
+        <div class="asset-tools">
+          <div class="nav-search">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M16 16L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <input id="assetSearch" type="search" placeholder="搜索标题、分类、ID、路径…">
+          </div>
+          <select class="sort-select" id="assetSort">
+            <option value="featured">画廊优先</option>
+            <option value="id-desc">ID 从新到旧</option>
+            <option value="id-asc">ID 从旧到新</option>
+            <option value="title">按标题</option>
+          </select>
+          <span class="spacer"></span>
+          <span class="count" id="assetCount">加载中…</span>
+          <span class="shown" id="assetShown"></span>
+        </div>
+        <div class="asset-grid" id="assetGrid"><div class="asset-loading">正在加载素材索引…</div></div>
+        <button class="asset-more" id="assetMore" style="display:none">显示更多</button>
+        <p class="asset-note">素材库按唯一图片路径去重。同一张图片可能同时出现在主画廊、经典版或历史数据中；多图作品沿用同一组标题和分类。历史池素材暂不单独展示提示词正文，主画廊关联素材可直接进入详情页。</p>
+      </section>
+    </div>
+  </div></section>
+</main>
+<script src="js/config.js?v=2"></script>
+<script src="js/base.js?v=8"></script>
+<script>
+App.init({ page:'assets', onReady:initAssets });
+
+const ASSET_SOURCE_LABELS = { modern:'主画廊', classic:'经典版', oldMain:'历史原图', oldTwitter:'Twitter 收录' };
+const ASSET_PART_URLS = ['data/assets/items.part1.json','data/assets/items.part2.json','data/assets/items.part3.json'];
+const ASSET_PAGE_SIZE = 120;
+
+function assetEsc(value){
+  return (value == null ? '' : String(value)).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+}
+
+async function initAssets(){
+  const grid = document.getElementById('assetGrid');
+  try {
+    const requests = ASSET_PART_URLS.map(url => fetch(url + '?v=8').then(r => { if (!r.ok) throw new Error('素材分片加载失败'); return r.json(); }));
+    const parts = await Promise.all(requests);
+    const items = [].concat(...parts.map(part => part.items || []));
+    setupAssetPage(items);
+  } catch (err) {
+    console.error(err);
+    grid.innerHTML = '<div class="asset-empty"><div class="big">⚠</div>素材索引加载失败，请刷新页面重试。</div>';
+    document.getElementById('assetCount').textContent = '加载失败';
+  }
+}
+
+function setupAssetPage(items){
+  const grid = document.getElementById('assetGrid');
+  const more = document.getElementById('assetMore');
+  const search = document.getElementById('assetSearch');
+  const sort = document.getElementById('assetSort');
+  const filterRail = document.getElementById('assetFilters');
+  const params = new URLSearchParams(location.search);
+
+  const counts = {
+    total: items.length,
+    sources: {},
+    buckets: {},
+    multi: items.filter(item => item.multi).length
+  };
+  for (const item of items){
+    for (const source of item.sources || []) counts.sources[source] = (counts.sources[source] || 0) + 1;
+    counts.buckets[item.bucket] = (counts.buckets[item.bucket] || 0) + 1;
+  }
+  const twitterTotal = (counts.buckets.twitter || 0) + (counts.buckets['twitter-cat1'] || 0) + (counts.buckets['twitter-cat2'] || 0);
+
+  const state = {
+    source: params.get('source') || 'all',
+    bucket: params.get('bucket') || 'all',
+    multi: params.get('multi') === '1',
+    q: params.get('q') || '',
+    sort: params.get('sort') || 'featured',
+    shown: ASSET_PAGE_SIZE
+  };
+
+  document.getElementById('assetsSummary').innerHTML = [
+    ['s1', counts.total.toLocaleString(), '唯一图片素材'],
+    ['s2', '13', '独立图片仓库'],
+    ['s3', '7.8 GiB', '原始文件备份'],
+    ['s4', '0', '画质压缩']
+  ].map(row => `<div class="s"><b>${row[1]}</b><span>${row[2]}</span></div>`).join('');
+
+  patchFilterCounts(filterRail, counts, twitterTotal);
+  search.value = state.q;
+  sort.value = state.sort;
+  syncAssetFilters(filterRail, state);
+
+  search.addEventListener('input', () => {
+    clearTimeout(search._assetTimer);
+    search._assetTimer = setTimeout(() => { state.q = search.value.trim(); state.shown = ASSET_PAGE_SIZE; renderAssets(); }, 120);
+  });
+  sort.addEventListener('change', () => { state.sort = sort.value; renderAssets(); });
+  more.addEventListener('click', () => { state.shown += ASSET_PAGE_SIZE; renderAssets(); });
+
+  filterRail.addEventListener('click', event => {
+    const button = event.target.closest('button[data-source],button[data-bucket],button[data-multi]');
+    if (!button) return;
+    if (button.dataset.source) state.source = button.dataset.source;
+    if (button.dataset.bucket) state.bucket = button.dataset.bucket;
+    if (button.dataset.multi) state.multi = !state.multi;
+    state.shown = ASSET_PAGE_SIZE;
+    syncAssetFilters(filterRail, state);
+    renderAssets();
+  });
+
+  function patchFilterCounts(rail, c, twitterCount){
+    rail.querySelector('[data-source="all"] .n').textContent = c.total.toLocaleString();
+    rail.querySelector('[data-source="modern"] .n').textContent = (c.sources.modern || 0).toLocaleString();
+    rail.querySelector('[data-source="classic"] .n').textContent = (c.sources.classic || 0).toLocaleString();
+    rail.querySelector('[data-source="oldMain"] .n').textContent = (c.sources.oldMain || 0).toLocaleString();
+    rail.querySelector('[data-source="oldTwitter"] .n').textContent = (c.sources.oldTwitter || 0).toLocaleString();
+    rail.querySelector('[data-bucket="all"] .n').textContent = c.total.toLocaleString();
+    rail.querySelector('[data-bucket="originals"] .n').textContent = (c.buckets.originals || 0).toLocaleString();
+    rail.querySelector('[data-bucket="twitter"] .n').textContent = twitterCount.toLocaleString();
+    rail.querySelector('[data-bucket="twitter-cat1"] .n').textContent = (c.buckets['twitter-cat1'] || 0).toLocaleString();
+    rail.querySelector('[data-bucket="twitter-cat2"] .n').textContent = (c.buckets['twitter-cat2'] || 0).toLocaleString();
+    rail.querySelector('[data-multi="1"] .n').textContent = c.multi.toLocaleString();
+  }
+
+  function filteredAssets(){
+    const query = state.q.toLowerCase();
+    let list = items.filter(item => {
+      if (state.source !== 'all' && !(item.sources || []).includes(state.source)) return false;
+      if (state.multi && !item.multi) return false;
+      if (state.bucket !== 'all'){
+        if (state.bucket === 'twitter'){
+          if (!item.bucket.startsWith('twitter')) return false;
+        } else if (item.bucket !== state.bucket) return false;
+      }
+      if (query){
+        const haystack = [item.title, item.category, item.id, item.path, item.repo].join(' ').toLowerCase();
+        if (!haystack.includes(query)) return false;
+      }
+      return true;
+    });
+    if (state.sort === 'id-desc') list = list.slice().sort((a,b) => (Number(b.id) || -1) - (Number(a.id) || -1));
+    else if (state.sort === 'id-asc') list = list.slice().sort((a,b) => (Number(a.id) || Number.MAX_SAFE_INTEGER) - (Number(b.id) || Number.MAX_SAFE_INTEGER));
+    else if (state.sort === 'title') list = list.slice().sort((a,b) => String(a.title).localeCompare(String(b.title), 'zh-CN'));
+    return list;
+  }
+
+  function renderAssets(){
+    const list = filteredAssets();
+    const visible = list.slice(0, state.shown);
+    document.getElementById('assetCount').textContent = '共 ' + list.length.toLocaleString() + ' 张';
+    document.getElementById('assetShown').textContent = list.length ? '已显示 ' + visible.length.toLocaleString() : '';
+    more.style.display = list.length > state.shown ? 'block' : 'none';
+    if (!list.length){
+      grid.innerHTML = '<div class="asset-empty"><div class="big">🗂️</div>没有匹配的素材，换个关键词或筛选条件试试。</div>';
+      return;
+    }
+    grid.innerHTML = visible.map((item, index) => assetCardHTML(item, index)).join('');
+    grid.querySelectorAll('[data-open]').forEach(button => button.addEventListener('click', () => openAssetLightbox(visible[Number(button.dataset.open)])));
+  }
+
+  function assetCardHTML(item, index){
+    const url = App.imgUrl(item.path);
+    const { bg, main } = App.catColor(item.category);
+    const placeholder = `<span class="asset-placeholder" style="background:linear-gradient(140deg,${bg},${main})">${assetEsc((item.category || '图').slice(0,1))}</span>`;
+    const image = url
+      ? `<img src="${assetEsc(url)}" loading="lazy" decoding="async" alt="${assetEsc(item.title || item.category)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="asset-placeholder" style="display:none;background:linear-gradient(140deg,${bg},${main})">${assetEsc((item.category || '图').slice(0,1))}</span>`
+      : placeholder;
+    const sources = (item.sources || []).map(source => `<span class="asset-source ${source}">${ASSET_SOURCE_LABELS[source] || source}</span>`).join('');
+    return `<article class="asset-card">
+      <button class="asset-open" type="button" data-open="${index}" aria-label="查看 ${assetEsc(item.title)}">
+        ${image}<span class="asset-repo">${assetEsc(item.repo || 'asset')}</span>
+      </button>
+      <div class="asset-body">
+        <button class="asset-title" type="button" data-open="${index}">${assetEsc(item.title || '未命名素材')}</button>
+        <div class="asset-meta"><span>${item.id == null ? '—' : '#' + item.id}</span><span class="cat">${assetEsc(item.category || '未分类')} · ${item.multi ? '多图' : '单图'}</span></div>
+        <div class="asset-source-row">${sources}</div>
+      </div>
+    </article>`;
+  }
+
+  function openAssetLightbox(item){
+    if (!item) return;
+    const lb = document.getElementById('db-lightbox');
+    if (!lb) return;
+    const url = App.imgUrl(item.path);
+    const { bg, main } = App.catColor(item.category);
+    const placeholder = `<div class="ph" style="background:linear-gradient(140deg,${bg},${main})"></div><span class="wm">${assetEsc((item.category || '图').slice(0,1))}</span>`;
+    document.getElementById('lbImg').innerHTML = url
+      ? `<img class="ph-img" src="${assetEsc(url)}" alt="${assetEsc(item.title || item.category)}" decoding="async">`
+      : placeholder;
+    const image = document.querySelector('#lbImg img');
+    if (image) image.addEventListener('error', () => { document.getElementById('lbImg').innerHTML = placeholder; });
+    const sources = (item.sources || []).map(source => `<span class="asset-source ${source}">${ASSET_SOURCE_LABELS[source] || source}</span>`).join('');
+    const galleryLink = item.sources && item.sources.includes('modern') && item.id != null
+      ? `<a class="btn btn-soft" href="detail.html?id=${item.id}">查看关联提示词</a>` : '';
+    document.getElementById('lbBody').innerHTML = `
+      <div class="lb-crumb"><a href="assets.html">素材库</a> › <span>${assetEsc(item.repo || '图片仓库')}</span></div>
+      <h2 class="lb-title">${assetEsc(item.title || '未命名素材')}</h2>
+      <div class="lb-tags"><span class="tag cc" style="--cc:${main};--cc-bg:${bg}">${assetEsc(item.category || '未分类')}</span><span class="tag">${item.id == null ? '无 ID' : 'ID #' + item.id}</span></div>
+      <div class="asset-source-row">${sources}</div>
+      <p class="lb-asset-path">${assetEsc(item.path)}</p>
+      <div class="lb-actions">
+        ${galleryLink}
+        ${url ? `<a class="btn btn-soft" href="${assetEsc(url)}" target="_blank" rel="noopener">打开原图</a>` : ''}
+        <button class="btn btn-soft" id="assetCopyLink">复制图片链接</button>
+      </div>`;
+    const copyButton = document.getElementById('assetCopyLink');
+    if (copyButton) copyButton.addEventListener('click', () => copyAssetLink(url || item.path));
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function copyAssetLink(text){
+    if (navigator.clipboard){
+      navigator.clipboard.writeText(text).then(() => App.toast('图片链接已复制')).catch(() => fallbackAssetCopy(text));
+    } else fallbackAssetCopy(text);
+  }
+
+  function fallbackAssetCopy(text){
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    try { document.execCommand('copy'); App.toast('图片链接已复制'); } catch (err) { App.toast('复制失败'); }
+    textarea.remove();
+  }
+
+  function syncAssetFilters(rail, current){
+    rail.querySelectorAll('[data-source]').forEach(button => button.classList.toggle('active', button.dataset.source === current.source));
+    rail.querySelectorAll('[data-bucket]').forEach(button => button.classList.toggle('active', button.dataset.bucket === current.bucket));
+    const multiButton = rail.querySelector('[data-multi]');
+    if (multiButton) multiButton.classList.toggle('active', current.multi);
+  }
+
+  renderAssets();
+}
+</script>
+</body>
+</html>

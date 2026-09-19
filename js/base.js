@@ -5,7 +5,7 @@
    ========================================================= */
 const App = (() => {
   // ---------- 配置 ----------
-  const ASSET_VERSION = '7';
+  const ASSET_VERSION = '8';
   const FAV_KEY = 'drawbox-boards-v1';
   const REC_KEY = 'drawbox-recent-v1';
   const IMAGE_CONFIG = window.DRAWBOX_CONFIG || {};
@@ -337,8 +337,3 @@ document.addEventListener('click', e => {
     App.openLightbox(+card.dataset.id);
   }
 });
-
-
-
-
-
