@@ -123,7 +123,7 @@
   </div></section>
 </main>
 <script src="js/config.js?v=2"></script>
-<script src="js/base.js?v=8"></script>
+<script src="js/base.js?v=9"></script>
 <script>
 App.init({ page:'assets', onReady:initAssets });
 
@@ -138,7 +138,7 @@ function assetEsc(value){
 async function initAssets(){
   const grid = document.getElementById('assetGrid');
   try {
-    const requests = ASSET_PART_URLS.map(url => fetch(url + '?v=8').then(r => { if (!r.ok) throw new Error('素材分片加载失败'); return r.json(); }));
+    const requests = ASSET_PART_URLS.map(url => fetch(url + '?v=9').then(r => { if (!r.ok) throw new Error('素材分片加载失败'); return r.json(); }));
     const parts = await Promise.all(requests);
     const items = [].concat(...parts.map(part => part.items || []));
     setupAssetPage(items);
